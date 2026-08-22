@@ -21,7 +21,10 @@ jobs:
           cache: "npm"
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Build Web App
+        run: npm run build
 
       - name: Add Capacitor iOS Platform
         run: npx cap add ios
