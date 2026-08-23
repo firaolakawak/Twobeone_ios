@@ -5535,12 +5535,15 @@
   --sidebar-ring: oklch(.708 0 0);
 }
 
-/* iOS Capacitor applies these insets natively through UIScrollView. */
-html.capacitor-native {
-  --app-safe-area-top: 0px;
-  --app-safe-area-bottom: 0px;
-  --safe-area-top-android: 0px;
-  --safe-area-bottom-android: 0px;
+/*
+ * Some WKWebView/device combinations report env(safe-area-inset-*) as zero.
+ * Keep iOS controls out of the system hit-test region even in that case.
+ */
+html.capacitor-ios {
+  --app-safe-area-top: 59px;
+  --app-safe-area-bottom: 34px;
+  --app-safe-area-top: max(env(safe-area-inset-top, 0px), 59px);
+  --app-safe-area-bottom: max(env(safe-area-inset-bottom, 0px), 34px);
 }
 
 .dark {

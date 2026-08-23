@@ -399,7 +399,7 @@ export function LandingPage({ onGetStarted, initialPage = null }: LandingPagePro
           {/* Mobile login */}
           <button
             onClick={onGetStarted}
-            className="md:hidden h-8 px-4 rounded-xl text-xs font-semibold text-white"
+            className="md:hidden min-h-11 min-w-24 px-5 rounded-xl text-sm font-semibold text-white touch-manipulation"
             style={{ background: "linear-gradient(135deg, var(--primary-500), var(--primary-600))" }}
           >
             Sign In

@@ -5,9 +5,9 @@ const config: CapacitorConfig = {
   appName: 'TwoBeOne',
   webDir: 'dist',
   ios: {
-    // Keep the entire web document inside the status-bar and home-indicator
-    // safe area. Web/PWA builds continue to use CSS env() insets instead.
-    contentInset: 'always',
+    // DOM safe-area padding is applied explicitly. Native scroll insets leave
+    // sticky/fixed controls visually shifted from their actual hit regions.
+    contentInset: 'never',
   },
 };
 

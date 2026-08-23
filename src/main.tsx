@@ -3,6 +3,8 @@ import { Capacitor } from "@capacitor/core";
 import App from "./app/App.tsx";
 import "./index.css";
 
-document.documentElement.classList.toggle("capacitor-native", Capacitor.isNativePlatform());
+const capacitorPlatform = Capacitor.getPlatform();
+document.documentElement.classList.toggle("capacitor-native", capacitorPlatform !== "web");
+document.documentElement.classList.toggle("capacitor-ios", capacitorPlatform === "ios");
 
 createRoot(document.getElementById("root")!).render(<App />);
