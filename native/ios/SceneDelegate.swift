@@ -4,8 +4,7 @@ import WebKit
 private let appURL = URL(string: "https://www.twobeone.app/?app=1")!
 
 /// A deliberately thin native container for the production web application.
-/// The page is not restyled, resized with JavaScript, or given a custom user
-/// agent. UIKit only keeps the browser viewport outside the system bars.
+/// The page owns its viewport and safe-area layout exactly as it does in Safari.
 final class AppWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private var webView: WKWebView!
 
@@ -36,10 +35,10 @@ final class AppWebViewController: UIViewController, WKNavigationDelegate, WKUIDe
 
         rootView.addSubview(webView)
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor),
-            webView.leadingAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor),
+            webView.topAnchor.constraint(equalTo: rootView.topAnchor),
+            webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor),
         ])
 
         self.webView = webView
@@ -48,12 +47,45 @@ final class AppWebViewController: UIViewController, WKNavigationDelegate, WKUIDe
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        webView.load(URLRequest(url: appURL, cachePolicy: .useProtocolCachePolicy))
+        clearStaleWebAppDataAndLoad(appURL)
     }
 
     func load(_ url: URL) {
         loadViewIfNeeded()
-        webView.load(URLRequest(url: url))
+        loadFromNetwork(url)
+    }
+
+    private func clearStaleWebAppDataAndLoad(_ url: URL) {
+        // Keep authentication, local storage, and user preferences. Only remove
+        // resources that can combine an old service-worker shell with new CSS.
+        let cacheTypes: Set<String> = [
+            WKWebsiteDataTypeDiskCache,
+            WKWebsiteDataTypeMemoryCache,
+            WKWebsiteDataTypeOfflineWebApplicationCache,
+            "WKWebsiteDataTypeServiceWorkerRegistrations",
+        ]
+
+        webView.configuration.websiteDataStore.removeData(
+            ofTypes: cacheTypes,
+            modifiedSince: .distantPast
+        ) { [weak self] in
+            DispatchQueue.main.async {
+                self?.loadFromNetwork(url)
+            }
+        }
+    }
+
+    private func loadFromNetwork(_ url: URL) {
+        let request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            timeoutInterval: 30
+        )
+        webView.load(request)
+    }
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        loadFromNetwork(webView.url ?? appURL)
     }
 
     func webView(
