@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 export const APP_SHELL_STORAGE_KEY = 'twobeone_app_shell';
 export const ONBOARDING_STORAGE_KEY = 'twobeone_onboarding_complete';
 
@@ -36,9 +38,9 @@ export function isApkUrlEnvironment(): boolean {
 }
 
 /**
- * Detects a URL-wrapper/PWA environment without relying on a native bridge.
- * `?app=1` is remembered because redirects and shared internal links may later
- * omit the query parameter inside the same isolated WebView storage context.
+ * Detects a native app, URL-wrapper, or installed PWA environment. `?app=1` is
+ * remembered because redirects and shared internal links may later omit the
+ * query parameter inside the same isolated WebView storage context.
  */
 export function isAppShellEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
@@ -49,9 +51,10 @@ export function isAppShellEnvironment(): boolean {
 
   const standalone = window.matchMedia?.('(display-mode: standalone)').matches === true;
   const iosStandalone = Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone);
+  const nativeApp = Capacitor.isNativePlatform();
 
   return appParameter === '1' || (
     appParameter !== '0' &&
-    (apkUrlEnvironment || standalone || iosStandalone)
+    (nativeApp || apkUrlEnvironment || standalone || iosStandalone)
   );
 }

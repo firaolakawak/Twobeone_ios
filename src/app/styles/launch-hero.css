@@ -1,3 +1,8 @@
+.landing-navigation {
+  /* WKWebView fills the whole display when viewport-fit=cover is enabled. */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 .launch-hero {
   --hero-ink: #21172f;
   --hero-muted: #6f657b;
@@ -7,7 +12,7 @@
   --hero-gold: #c99b52;
   position: relative;
   isolation: isolate;
-  min-height: calc(100svh - 4rem);
+  min-height: calc(100svh - 4rem - env(safe-area-inset-top, 0px));
   overflow: hidden;
   background:
     radial-gradient(circle at 84% 18%, rgba(255, 224, 197, .72), transparent 27%),
@@ -55,7 +60,7 @@
 
 .launch-hero__inner {
   width: min(100% - 2rem, 80rem);
-  min-height: calc(100svh - 4rem);
+  min-height: calc(100svh - 4rem - env(safe-area-inset-top, 0px));
   margin: 0 auto;
   padding: clamp(3rem, 7vh, 6.5rem) 0 clamp(3.5rem, 8vh, 6rem);
   display: grid;

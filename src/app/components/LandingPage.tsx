@@ -339,7 +339,7 @@ export function LandingPage({ onGetStarted, initialPage = null }: LandingPagePro
           NAVIGATION
       ═══════════════════════════════════════ */}
       <nav
-        className="sticky top-0 z-50 border-b"
+        className="landing-navigation sticky top-0 z-50 border-b"
         style={{
           background: "rgba(255,255,255,0.82)",
           backdropFilter: "blur(20px)",
