@@ -147,7 +147,7 @@ export function PWAInstallPrompt() {
       role="dialog"
       aria-modal="false"
       aria-labelledby="install-twobeone-title"
-      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.75rem)] z-[220] mx-auto max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300 md:bottom-6 md:left-auto md:right-6 md:mx-0 md:w-[25rem]"
+      className="fixed inset-x-3 bottom-[calc(var(--app-safe-area-bottom,env(safe-area-inset-bottom,0px))+5.75rem)] z-[220] mx-auto max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300 md:bottom-6 md:left-auto md:right-6 md:mx-0 md:w-[25rem]"
     >
       <div className="overflow-hidden rounded-[1.75rem] border border-rose-100 bg-white/95 shadow-[0_22px_60px_-18px_rgba(136,19,55,0.35)] backdrop-blur-xl">
         <div className="relative bg-gradient-to-br from-rose-500 via-pink-500 to-rose-600 px-5 pb-4 pt-5 text-white">

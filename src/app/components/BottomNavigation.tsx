@@ -25,7 +25,7 @@ export const BottomNavigation = memo(function BottomNavigation({ activeTab, onTa
   return (
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 bg-gradient-to-t from-white via-white/95 to-transparent px-3 pt-5"
-      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+      style={{ paddingBottom: 'calc(var(--app-safe-area-bottom, env(safe-area-inset-bottom, 0px)) + 12px)' }}
     >
       <nav
         aria-label={t.nav.primaryNavigation}

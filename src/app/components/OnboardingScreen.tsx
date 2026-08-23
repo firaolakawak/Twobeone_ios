@@ -129,8 +129,8 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     <main
       className="relative isolate flex min-h-screen min-h-[100dvh] flex-col overflow-x-hidden overflow-y-auto bg-white text-slate-950"
       style={{
-        paddingTop: "max(var(--safe-area-top-android, 32px), env(safe-area-inset-top, 0px))",
-        paddingBottom: "max(var(--safe-area-bottom-android, 24px), env(safe-area-inset-bottom, 0px))",
+        paddingTop: "max(var(--safe-area-top-android, 32px), var(--app-safe-area-top, env(safe-area-inset-top, 0px)))",
+        paddingBottom: "max(var(--safe-area-bottom-android, 24px), var(--app-safe-area-bottom, env(safe-area-inset-bottom, 0px)))",
       }}
     >
       <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-rose-200/55 blur-3xl" />

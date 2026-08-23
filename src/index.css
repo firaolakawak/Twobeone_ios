@@ -5498,6 +5498,8 @@
   --safe-area-bottom-android: 24px;
   --safe-area-top: var(--safe-area-top-ios);
   --safe-area-bottom: var(--safe-area-bottom-ios);
+  --app-safe-area-top: env(safe-area-inset-top, 0px);
+  --app-safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --touch-target-min: 44px;
   --touch-target-comfortable: 56px;
   --icon-xs: 16px;
@@ -5531,6 +5533,14 @@
   --sidebar-accent-foreground: oklch(.205 0 0);
   --sidebar-border: oklch(.922 0 0);
   --sidebar-ring: oklch(.708 0 0);
+}
+
+/* iOS Capacitor applies these insets natively through UIScrollView. */
+html.capacitor-native {
+  --app-safe-area-top: 0px;
+  --app-safe-area-bottom: 0px;
+  --safe-area-top-android: 0px;
+  --safe-area-bottom-android: 0px;
 }
 
 .dark {

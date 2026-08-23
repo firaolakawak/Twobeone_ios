@@ -299,7 +299,7 @@ export function AuthPage({ onAuthSuccess, initialMode = 'signin' }: AuthPageProp
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 'calc(var(--spacing-4) + env(safe-area-inset-top, 0px)) var(--spacing-4) calc(var(--spacing-4) + env(safe-area-inset-bottom, 0px))',
+      padding: 'calc(var(--spacing-4) + var(--app-safe-area-top, env(safe-area-inset-top, 0px))) var(--spacing-4) calc(var(--spacing-4) + var(--app-safe-area-bottom, env(safe-area-inset-bottom, 0px)))',
       background: 'var(--background)',
       position: 'relative',
       overflow: 'hidden',
@@ -310,7 +310,7 @@ export function AuthPage({ onAuthSuccess, initialMode = 'signin' }: AuthPageProp
       <FloatingOrb style={{ width: 200, height: 200, background: 'var(--secondary-100)', top: '40%', left: '5%', opacity: 0.5 }} />
 
       {/* Language selector */}
-      <div style={{ position: 'fixed', top: 'calc(var(--spacing-4) + env(safe-area-inset-top, 0px))', right: 'var(--spacing-4)', zIndex: 50 }}>
+      <div style={{ position: 'fixed', top: 'calc(var(--spacing-4) + var(--app-safe-area-top, env(safe-area-inset-top, 0px)))', right: 'var(--spacing-4)', zIndex: 50 }}>
         <LanguageSelector />
       </div>
 
