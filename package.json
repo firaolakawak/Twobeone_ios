@@ -5,7 +5,7 @@
   "scripts": {
     "start": "expo start",
     "build": "vite build",
-    "sync:ios": "npm run build && cap sync ios",
+    "sync:ios": "npm run build && cap sync ios && ./scripts/configure-ios-webview.sh",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",

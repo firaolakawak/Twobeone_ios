@@ -32,6 +32,9 @@ jobs:
       - name: Sync Capacitor iOS
         run: npx cap sync ios
 
+      - name: Configure Remote WebView
+        run: ./scripts/configure-ios-webview.sh
+
       - name: Build iOS Simulator Binary
         working-directory: ios/App
         run: |
