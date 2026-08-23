@@ -1,108 +1,12 @@
 import UIKit
+import Capacitor
 import WebKit
 
-private let appURL = URL(string: "https://www.twobeone.app/?app=1")!
-
-/// A deliberately thin native container for the production web application.
-/// The page owns its viewport and safe-area layout exactly as it does in Safari.
-final class AppWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
-    private var webView: WKWebView!
-
-    override func loadView() {
-        let rootView = UIView()
-        rootView.backgroundColor = .white
-
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .default()
-        configuration.allowsInlineMediaPlayback = true
-        configuration.mediaTypesRequiringUserActionForPlayback = []
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
-
-        if #available(iOS 13.0, *) {
-            configuration.defaultWebpagePreferences.preferredContentMode = .mobile
-        }
-
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        webView.navigationDelegate = self
-        webView.uiDelegate = self
-        webView.allowsBackForwardNavigationGestures = true
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.scrollView.keyboardDismissMode = .interactive
-        webView.isOpaque = true
-        webView.backgroundColor = .white
-        webView.scrollView.backgroundColor = .white
-
-        rootView.addSubview(webView)
-        NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: rootView.topAnchor),
-            webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor),
-        ])
-
-        self.webView = webView
-        view = rootView
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        clearStaleWebAppDataAndLoad(appURL)
-    }
-
-    func load(_ url: URL) {
-        loadViewIfNeeded()
-        loadFromNetwork(url)
-    }
-
-    private func clearStaleWebAppDataAndLoad(_ url: URL) {
-        // Keep authentication, local storage, and user preferences. Only remove
-        // resources that can combine an old service-worker shell with new CSS.
-        let cacheTypes: Set<String> = [
-            WKWebsiteDataTypeDiskCache,
-            WKWebsiteDataTypeMemoryCache,
-            WKWebsiteDataTypeOfflineWebApplicationCache,
-            "WKWebsiteDataTypeServiceWorkerRegistrations",
-        ]
-
-        webView.configuration.websiteDataStore.removeData(
-            ofTypes: cacheTypes,
-            modifiedSince: .distantPast
-        ) { [weak self] in
-            DispatchQueue.main.async {
-                self?.loadFromNetwork(url)
-            }
-        }
-    }
-
-    private func loadFromNetwork(_ url: URL) {
-        let request = URLRequest(
-            url: url,
-            cachePolicy: .reloadIgnoringLocalCacheData,
-            timeoutInterval: 30
-        )
-        webView.load(request)
-    }
-
-    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        loadFromNetwork(webView.url ?? appURL)
-    }
-
-    func webView(
-        _ webView: WKWebView,
-        createWebViewWith configuration: WKWebViewConfiguration,
-        for navigationAction: WKNavigationAction,
-        windowFeatures: WKWindowFeatures
-    ) -> WKWebView? {
-        if navigationAction.targetFrame == nil, let url = navigationAction.request.url {
-            webView.load(URLRequest(url: url))
-        }
-        return nil
-    }
-}
-
+/// Standard Capacitor WebView host. The production URL is supplied exclusively
+/// by capacitor.config.ts, so the native layer does not alter the remote page.
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
+    private var didInstallBridge = false
 
     func scene(
         _ scene: UIScene,
@@ -112,23 +16,57 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.backgroundColor = .white
-        window.rootViewController = AppWebViewController()
+        let loadingController = UIViewController()
+        loadingController.view.backgroundColor = .white
+        window.rootViewController = loadingController
         self.window = window
         window.makeKeyAndVisible()
+
+        SceneDelegateProxy.shared.scene(
+            scene,
+            willConnectTo: session,
+            options: connectionOptions
+        )
+
+        clearWebCachesAndInstallBridge()
+    }
+
+    private func clearWebCachesAndInstallBridge() {
+        URLCache.shared.removeAllCachedResponses()
+
+        let availableTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        let cacheTypes = availableTypes.filter { type in
+            let normalizedType = type.lowercased()
+            return normalizedType.contains("cache") || normalizedType.contains("serviceworker")
+        }
+
+        let fallback = DispatchWorkItem { [weak self] in
+            self?.installBridgeIfNeeded()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: fallback)
+
+        WKWebsiteDataStore.default().removeData(
+            ofTypes: cacheTypes,
+            modifiedSince: .distantPast
+        ) { [weak self] in
+            DispatchQueue.main.async {
+                fallback.cancel()
+                self?.installBridgeIfNeeded()
+            }
+        }
+    }
+
+    private func installBridgeIfNeeded() {
+        guard !didInstallBridge else { return }
+        didInstallBridge = true
+        window?.rootViewController = CAPBridgeViewController()
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let url = URLContexts.first?.url else { return }
-        webViewController?.load(url)
+        SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        guard let url = userActivity.webpageURL else { return }
-        webViewController?.load(url)
-    }
-
-    private var webViewController: AppWebViewController? {
-        window?.rootViewController as? AppWebViewController
+        SceneDelegateProxy.shared.scene(scene, continue: userActivity)
     }
 }

@@ -18,14 +18,18 @@ cp "${source_file}" "${destination_file}"
 mkdir -p "${scheme_directory}"
 cp "${scheme_source}" "${scheme_directory}/App.xcscheme"
 
-# The Capacitor template declares its bridge controller in Main.storyboard.
-# This app creates its WKWebView controller in SceneDelegate instead, so leaving
-# those keys in place can initialize both controller paths during debugging.
+# Restore the standard Capacitor storyboard declarations if an older setup
+# script removed them. CAPBridgeViewController depends on the normal template
+# lifecycle and remains the sole WebView host.
 if [[ -x /usr/libexec/PlistBuddy ]]; then
-  /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" "${info_plist}" 2>/dev/null || true
+  /usr/libexec/PlistBuddy -c "Print :UIMainStoryboardFile" "${info_plist}" >/dev/null 2>&1 || \
+    /usr/libexec/PlistBuddy -c "Add :UIMainStoryboardFile string Main" "${info_plist}"
   /usr/libexec/PlistBuddy \
-    -c "Delete :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneStoryboardFile" \
-    "${info_plist}" 2>/dev/null || true
+    -c "Print :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneStoryboardFile" \
+    "${info_plist}" >/dev/null 2>&1 || \
+    /usr/libexec/PlistBuddy \
+      -c "Add :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneStoryboardFile string Main" \
+      "${info_plist}"
 fi
 
 echo "Configured iOS to load the production web app in WKWebView."

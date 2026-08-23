@@ -5,12 +5,17 @@ const config: CapacitorConfig = {
   appName: 'TwoBeOne',
   webDir: 'dist',
   server: {
-    url: 'https://www.twobeone.app/?app=1',
+    // Bump nativeBuild whenever an installed WebView must bypass an older app
+    // shell while keeping the production app route unchanged.
+    url: 'https://www.twobeone.app/?app=1&nativeBuild=20260823-1',
   },
   ios: {
     // DOM safe-area padding is applied explicitly. Native scroll insets leave
     // sticky/fixed controls visually shifted from their actual hit regions.
     contentInset: 'never',
+    preferredContentMode: 'mobile',
+    scrollEnabled: true,
+    backgroundColor: '#ffffff',
   },
 };
 
