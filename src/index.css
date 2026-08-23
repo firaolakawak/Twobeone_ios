@@ -5546,6 +5546,25 @@ html.capacitor-ios {
   --app-safe-area-bottom: max(env(safe-area-inset-bottom, 0px), 34px);
 }
 
+/* Keep the native WKWebView at a stable one-column viewport. Vertical page
+ * scrolling remains native; horizontal rubber-banding and text autosizing do
+ * not get a chance to distort the interface. */
+html.capacitor-native {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+html.capacitor-native body,
+html.capacitor-native #root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
 .dark {
   --background: oklch(.145 0 0);
   --foreground: oklch(.985 0 0);

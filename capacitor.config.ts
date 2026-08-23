@@ -11,6 +11,13 @@ const config: CapacitorConfig = {
     // DOM safe-area padding is applied explicitly. Native scroll insets leave
     // sticky/fixed controls visually shifted from their actual hit regions.
     contentInset: 'never',
+    // Keep WKWebView from switching to a desktop layout or retaining an
+    // accidental pinch-zoom level between interactions.
+    preferredContentMode: 'mobile',
+    zoomEnabled: false,
+    scrollEnabled: true,
+    allowsLinkPreview: false,
+    backgroundColor: '#ffffff',
   },
 };
 
